@@ -10,7 +10,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { createNotification } from '../../recoilModel/dispatchers/notification';
 import { ImportSuccessNotification } from '../../components/ImportModal/ImportSuccessNotification';
 import { useRecoilValue } from 'recoil';
-import { dispatcherState } from '../../recoilModel';
+import { dispatcherState, locationState } from '../../recoilModel';
 import { PullStatus } from './pullStatus';
 
 type PullDialogProps = {
@@ -32,7 +32,8 @@ export const PullDialog: React.FC<PullDialogProps> = (props) => {
   const { onDismiss, projectId, selectedTarget } = props;
   const [status, setStatus] = useState<PullDialogStatus>('connecting');
   const [error, setError] = useState<string>('');
-  const { addNotification } = useRecoilValue(dispatcherState);
+  const { addNotification, openProject } = useRecoilValue(dispatcherState);
+  const botLocation = useRecoilValue(locationState(projectId));
 
   // TODO: pull needs to be broken down into a previous auth step so the UI can reflect status
   // properly like in import flow
@@ -43,12 +44,10 @@ export const PullDialog: React.FC<PullDialogProps> = (props) => {
         setStatus('downloading');
 
         try {
-          console.log('doing the pull');
           // wait for pull result from server
           const res = await fetch(`/api/publish/${projectId}/pull/${selectedTarget.name}`, {
             method: 'POST',
           });
-          console.log('got pull result back: ', res);
           if (res.status && res.status === 200) {
             const { backupLocation } = await res.json();
             // show notification indicating success and close dialog
@@ -61,6 +60,8 @@ export const PullDialog: React.FC<PullDialogProps> = (props) => {
               }),
             });
             addNotification(notification);
+            // reload the bot project to update the authoring canvas
+            openProject(botLocation, undefined, false);
             onDismiss();
             return;
           }
@@ -82,7 +83,6 @@ export const PullDialog: React.FC<PullDialogProps> = (props) => {
   useEffect(() => {
     if (status === 'connecting') {
       // start the pull
-      console.log('starting pull');
       setTimeout(() => {
         pull();
       }, CONNECTING_STATUS_DISPLAY_TIME);
