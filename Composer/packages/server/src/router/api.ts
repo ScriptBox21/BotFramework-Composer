@@ -15,10 +15,8 @@ import * as ExtensionsController from '../controllers/extensions';
 import { FeatureFlagController } from '../controllers/featureFlags';
 import { AuthController } from '../controllers/auth';
 import { csrfProtection } from '../middleware/csrfProtection';
-
 import { UtilitiesController } from './../controllers/utilities';
 import { ImportController } from '../controllers/import';
-import { AuthController } from '../controllers/auth';
 
 const router: Router = express.Router({});
 
