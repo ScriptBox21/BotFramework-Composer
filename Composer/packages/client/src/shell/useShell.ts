@@ -35,6 +35,7 @@ import { useLuApi } from './luApi';
 import { useQnaApi } from './qnaApi';
 import { useTriggerApi } from './triggerApi';
 import { useActionApi } from './actionApi';
+import { useEventLogger } from '../telemetry/getEventLogger';
 
 const FORM_EDITOR = 'PropertyEditor';
 
@@ -165,7 +166,10 @@ export function useShell(source: EventSource, projectId: string): Shell {
 
   dialogMapRef.current = dialogsMap;
 
+  const telemetryLogger = useEventLogger({ page: 'Design', source });
+
   const api: ShellApi = {
+    telemetryLogger,
     getDialog: (dialogId: string) => {
       return dialogMapRef.current[dialogId];
     },

@@ -24,6 +24,7 @@ import { Dispatcher } from '../recoilModel/dispatchers';
 import { dispatcherState } from './../recoilModel/DispatcherWrapper';
 import { useActionApi } from './actionApi';
 import { useLuApi } from './luApi';
+import { useEventLogger } from '../telemetry/getEventLogger';
 
 const defaultQnATriggerData = {
   $kind: qnaMatcherKey,
@@ -43,6 +44,8 @@ function createTriggerApi(
   deleteActions: (dialogId: string, actions: MicrosoftIDialog[]) => Promise<void>,
   removeLuIntent: (id: string, intentName: string) => void
 ) {
+  const telemetryLogger = useEventLogger();
+
   const getDesignerIdFromDialogPath = (dialog, path) => {
     const value = get(dialog, path, '');
     const startIndex = value.lastIndexOf('_');
@@ -56,6 +59,9 @@ function createTriggerApi(
     const dialog = dialogResolver(id);
     const { createLuIntent, createLgTemplates, updateDialog, selectTo } = dispatchers;
     const { projectId, schemas, dialogs, locale, lgFiles } = state;
+
+    telemetryLogger.log('ActionAdded', { type: formData.$kind });
+
     if (!luFile) throw new Error(`lu file ${id} not found`);
     if (!lgFile) throw new Error(`lg file ${id} not found`);
     if (!dialog) throw new Error(`dialog ${id} not found`);

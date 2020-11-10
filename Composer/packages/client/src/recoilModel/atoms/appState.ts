@@ -231,3 +231,14 @@ export const pageElementState = atom<{ [page in PageMode]?: { [key: string]: any
     qna: {},
   },
 });
+
+type ServerSettings = {
+  telemetry?: {
+    allowDataCollection?: boolean | null;
+  };
+};
+
+export const ServerSettingsState = atom<ServerSettings>({
+  key: getFullyQualifiedKey('serverSettings'),
+  default: {},
+});

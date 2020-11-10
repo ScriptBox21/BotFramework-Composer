@@ -34,6 +34,7 @@ import { EmulatorOpenButton } from './emulatorOpenButton';
 import { Loading } from './loading';
 import { ErrorInfo } from './errorInfo';
 import { WarningInfo } from './warningInfo';
+import { useEventLogger } from '../../telemetry/getEventLogger';
 
 // -------------------- Styles -------------------- //
 
@@ -87,6 +88,7 @@ export const TestController: React.FC<{ projectId: string }> = (props) => {
   const publishDialogConfig = { subscriptionKey: settings.qna?.subscriptionKey, ...settings.luis } as IConfig;
   const warningLength = notifications.filter((n) => n.severity === 'Warning').length;
   const showWarning = !showError && warningLength > 0;
+  const logger = useEventLogger();
 
   useEffect(() => {
     if (projectId) {
@@ -203,6 +205,7 @@ export const TestController: React.FC<{ projectId: string }> = (props) => {
   }
 
   async function handleOpenEmulator() {
+    logger.log('EmulatorButtonClicked');
     return Promise.resolve(
       openInEmulator(
         botEndpoints[projectId] || 'http://localhost:3979/api/messages',
